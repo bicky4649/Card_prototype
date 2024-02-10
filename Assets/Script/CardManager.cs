@@ -8,12 +8,14 @@ public class CardManager : MonoBehaviour
     // カードを入れる用の配列　0,木　1,水　2,火
     [SerializeField] GameObject[] P1Cards;
     [SerializeField] GameObject[] P2Cards;
+    [SerializeField] GameObject battlecamera;
+    [SerializeField] GameObject skillcamera;
     
     // 現在のカードの状態を保存する変数
     private int P1CardNum;
     private int P2CardNum;
     // 現在のプレイヤーを保持する変数
-    private int CurrentPlayer;
+    private int CurrentPlayer = 1;
 
     // プレイヤーの体力
     [SerializeField] int P1HP = 10;
@@ -25,6 +27,8 @@ public class CardManager : MonoBehaviour
 
     private void Start()
     {
+        battlecamera.SetActive(true);
+        skillcamera.SetActive(false);
         P1CardNum = Random.Range(0,P1Cards.Length);
         P2CardNum = Random.Range(0,P2Cards.Length);
         Debug.Log("P1: " + P1CardNum + "P2: " + P2CardNum);
@@ -49,7 +53,7 @@ public class CardManager : MonoBehaviour
             else pos.y = 0;
             P2Cards[i].transform.localPosition = pos;
         }
-        CurrentPLayerText.text = "CurrentPlayer : P" + ( CurrentPlayer + 1 );
+        CurrentPLayerText.text = "CurrentPlayer : P" +  CurrentPlayer;
         //現在のプレイヤーを表示させるテキスト
         P1HP_Text.text = "P1: " + P1HP;
         P2HP_Text.text = "P2: " + P2HP;       
@@ -58,12 +62,12 @@ public class CardManager : MonoBehaviour
     public void ShuffleCard()
     {
         //現在のプレイヤーに応じてシャッフル
-        if (CurrentPlayer == 0)
+        if (CurrentPlayer == 1)
         {
             int pre = P1CardNum;
             while(pre == P1CardNum) P1CardNum = Random.Range(0,P1Cards.Length);
         }
-        else
+        if (CurrentPlayer == 2)
         {
             int pre = P2CardNum;
             while(pre == P2CardNum) P2CardNum = Random.Range(0,P2Cards.Length);
@@ -71,44 +75,80 @@ public class CardManager : MonoBehaviour
         Debug.Log("P1: " + P1CardNum + "P2 " + P2CardNum);
     }
 
-    public void moveTurn()
+    public void moveTurn() //ターン性の切り替え
     {
-        CurrentPlayer = (CurrentPlayer + 1) % 2;
+        CurrentPlayer = CurrentPlayer + 1;
+        if (CurrentPlayer > 2)
+        {
+            CurrentPlayer = 1; 
+        }
     }
 
     public void attack() //　0,木　1,水　2,火
     {
-        if (CurrentPlayer == 1)
+        battlecamera.SetActive(false);
+        skillcamera.SetActive(true);
+        /*if (CurrentPlayer == 1)//P1の攻撃
         {
-            if (P1CardNum == P2CardNum) P1HP -= 3;
-            else if ((P2CardNum - P1CardNum) % 2 == 1)
+            if (P1CardNum == P2CardNum) P2HP -= 3;
+            else if (P1CardNum == 2)
+            {
+                if ((P1CardNum - P2CardNum) % 2 == 0)
                 {
-                    if (P1CardNum > P2CardNum)
-                        P1HP -= 1;
-                    else P1HP -= 5;
+                    P2HP -= 5;
                 }
+                else P2HP -= 1;
+            }
+            else if (P1CardNum == 1)
+            {
+                if ((P1CardNum -P2CardNum) < 0)
+                {
+                    P2HP -= 5;
+                }
+                else P2HP -= 1;
+            }
             else
             {
-                if (P1CardNum > P2CardNum)
-                    P1HP -= 5;
-                else P1HP -= 1;
+                if((P1CardNum - P2CardNum) % 2 == 1)
+                {
+                    P2HP -= 5;
+                }
+                else P2HP -= 1;
             }
         }
-        else
+        if (CurrentPlayer == 2) //P2の攻撃
         {
-            if (P1CardNum == P2CardNum) P1HP -= 3;
-            else if ((P2CardNum - P1CardNum) % 2 == 1)
+            if (P2CardNum == P1CardNum) P1HP -= 3;
+            else if (P2CardNum == 2)
             {
-                if (P1CardNum > P2CardNum)
-                    P1HP -= 1;
-                else P1HP -= 5;
+                if ((P2CardNum - P1CardNum) % 2 == 0)
+                {
+                    P1HP -= 5;
+                }
+                else P1HP -= 1;
+            }
+            else if (P2CardNum == 1)
+            {
+                if ((P2CardNum - P1CardNum) < 0)
+                {
+                    P1HP -= 5;
+                }
+                else P1HP -= 1;
             }
             else
             {
-                if (P1CardNum > P2CardNum)
+                if((P2CardNum - P1CardNum) % 2 == 1)
+                {
                     P1HP -= 5;
+                }
                 else P1HP -= 1;
             }
-        }
+        }*/
+    }
+
+    public void back()
+    {
+        battlecamera.SetActive(true);
+        skillcamera.SetActive(false);
     }
 }
